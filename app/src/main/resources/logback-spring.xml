@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Normal console output so you can see logs in terminal -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Loki appender - ships logs to Loki automatically -->
+    <!-- Every log.info() or log.error() in your code gets sent here -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <!-- Loki URL inside Docker network -->
+            <url>http://loki:3100/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <!-- Labels help you filter logs in Grafana -->
+                <pattern>app=order-tracker,level=%level,host=${HOSTNAME}</pattern>
+            </label>
+            <message>
+                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </message>
+        </format>
+    </appender>
+
+    <!-- Send all logs to both console AND Loki -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOKI"/>
+    </root>
+
+    <!-- Your own code logs at DEBUG level for more detail -->
+    <logger name="com.ordertracker" level="DEBUG"/>
+
+</configuration>
