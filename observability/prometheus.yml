@@ -1,0 +1,23 @@
+# Prometheus configuration
+# Prometheus works by PULLING metrics from your app every X seconds
+# This is called "scraping"
+
+global:
+  scrape_interval: 15s      # Pull metrics every 15 seconds
+  evaluation_interval: 15s  # Evaluate alert rules every 15 seconds
+
+scrape_configs:
+
+  # Scrape job 1 - your Spring Boot app
+  - job_name: 'order-tracker'
+    # Where to find the metrics endpoint
+    # Spring Boot Actuator exposes this automatically at /actuator/prometheus
+    static_configs:
+      - targets: ['order-tracker-app:8080']
+    metrics_path: '/actuator/prometheus'
+
+  # Scrape job 2 - Prometheus scrapes itself too
+  # This lets you monitor Prometheus performance in Grafana
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
